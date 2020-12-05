@@ -41,13 +41,13 @@ void testBitVector(bit_vector& b, int64_t size, std::uniform_int_distribution<in
     for(int i = 0; i < 1000; i++) rb.rank(i);
 
     int64_t idx = 0;
-    vector<int64_t> observations(10000);
+    vector<int64_t> observations(SAMPLE_SIZE);
     std::cout << "Statistics. Sample size: " << SAMPLE_SIZE << endl;
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-        size_t idx = (idx + distribution(generator)) % size;
-        size_t ans = rb.rank(idx);
+        idx = (idx + distribution(generator)) % size;
+        rb.rank(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
     }
@@ -77,13 +77,13 @@ void testBitVectorV5(bit_vector& b, int64_t size, std::uniform_int_distribution<
     for(int i = 0; i < 1000; i++) rb.rank(i);
 
     int64_t idx = 0;
-    vector<int64_t> observations(10000);
+    vector<int64_t> observations(SAMPLE_SIZE);
     std::cout << "Statistics. Sample size: " << SAMPLE_SIZE << endl;
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-        size_t idx = (idx + distribution(generator)) % size;
-        size_t ans = rb.rank(idx);
+        idx = (idx + distribution(generator)) % size;
+        rb.rank(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
     }
@@ -114,13 +114,13 @@ void testBitVectorSelect(bit_vector& b, int64_t size, std::uniform_int_distribut
     for(int i = 0; i < 1000; i++) selectb.select((i % onesInBitVector) + 1);
     std::cout << "Warm up complete\n";
     int64_t idx = 0;
-    vector<int64_t> observations(10000);
+    vector<int64_t> observations(SAMPLE_SIZE);
     std::cout << "Statistics. Sample size: " << SAMPLE_SIZE << endl;
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-        size_t idx = ((idx + distribution(generator)) % onesInBitVector) + 1;
-        size_t ans = selectb.select(idx);
+        idx = ((idx + distribution(generator)) % onesInBitVector) + 1;
+        selectb.select(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
     }
@@ -157,8 +157,8 @@ void testRRRVector(bit_vector& b, int64_t size, std::uniform_int_distribution<in
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-        size_t idx = (idx + distribution(generator)) % size;
-        size_t ans = rank_rrrb.rank(idx);
+        idx = (idx + distribution(generator)) % size;
+        rank_rrrb.rank(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
     }
@@ -193,8 +193,8 @@ void testRRRVectorSelect(bit_vector& b, int64_t size, std::uniform_int_distribut
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-        size_t idx = ((idx + distribution(generator)) % onesInBitVector) + 1;
-        size_t ans = select_rrrb.select(idx);
+        idx = ((idx + distribution(generator)) % onesInBitVector) + 1;
+        select_rrrb.select(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
     }
@@ -229,8 +229,8 @@ void testSDVector(bit_vector& b, int64_t size, std::uniform_int_distribution<int
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-        size_t idx = (idx + distribution(generator)) % size;
-        size_t ans = rank_sdb.rank(idx);
+        idx = (idx + distribution(generator)) % size;
+        rank_sdb.rank(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
     }
@@ -265,8 +265,8 @@ void testSDVectorSelect(bit_vector& b, int64_t size, std::uniform_int_distributi
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-        size_t idx = ((idx + distribution(generator)) % onesInBitVector) + 1;
-        size_t ans = select_sdb.select(idx);
+        idx = ((idx + distribution(generator)) % onesInBitVector) + 1;
+        select_sdb.select(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
     }
