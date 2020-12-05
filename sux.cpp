@@ -1,5 +1,6 @@
 // g++ -g -std=c++17 -Wall -Wextra -O0 -march=native -I ./ -I ~/include sux.cpp -fsanitize=address -fsanitize=undefined
 #include <sux/bits/Rank9Sel.hpp>
+
 #include <random>
 #include <chrono>
 #include <math.h>
@@ -34,7 +35,7 @@ void testRank(int64_t* b, int64_t sizeInBytes, std::uniform_int_distribution<int
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
     Rank9Sel<> ranker((const uint64_t*) b, sizeInBytes);
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
-    std::cout << "STRUCTURE - BITVECTOR (MUTABLE) | OPERATION - RANK\n";
+    std::cout << "STRUCTURE - Rank9Sel | OPERATION - RANK\n";
     std::cout << "Time to create struture: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << "µs" << endl;
     std::cout << "Size of structure in bytes: " << ranker.size() << endl;
 
@@ -60,17 +61,16 @@ void testRank(int64_t* b, int64_t sizeInBytes, std::uniform_int_distribution<int
     std::cout << "Mediana: " << statistics[3] << endl;
     std::cout << "========================================================\n";
 
-    observations.clear();
-    // outputFile << "bitvector,rank,rank_support_v," << (size >> 3) << "," << ranker.size() << ",";
-    // outputFile << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
-    // outputFile << statistics[0] << "," << statistics[1] << "," << statistics[2] << "," << statistics[3];
+    outputFile << "int64_t*,rank,Rank9Sel," << sizeInBytes << "," << ranker.size() << ",";
+    outputFile << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
+    outputFile << statistics[0] << "," << statistics[1] << "," << statistics[2] << "," << statistics[3];
 }
 
 void testSelect(int64_t* b, int64_t sizeInBytes, std::uniform_int_distribution<int64_t>& distribution) {
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
     Rank9Sel<> ranker((const uint64_t*) b, sizeInBytes);
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
-    std::cout << "STRUCTURE - BITVECTOR (MUTABLE) | OPERATION - SELECT\n";
+    std::cout << "STRUCTURE - Rank9Sel | OPERATION - SELECT\n";
     std::cout << "Time to create struture: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << "µs" << endl;
     std::cout << "Size of structure in bytes: " << ranker.size() << endl;
 
@@ -96,41 +96,47 @@ void testSelect(int64_t* b, int64_t sizeInBytes, std::uniform_int_distribution<i
     std::cout << "Mediana: " << statistics[3] << endl;
     std::cout << "========================================================\n";
 
-    // outputFile << "bitvector,rank,rank_support_v," << (size >> 3) << "," << ranker.size() << ",";
-    // outputFile << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
-    // outputFile << statistics[0] << "," << statistics[1] << "," << statistics[2] << "," << statistics[3];
+    outputFile << "int64_t*,rank,Rank9Sel," << sizeInBytes << "," << ranker.size() << ",";
+    outputFile << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
+    outputFile << statistics[0] << "," << statistics[1] << "," << statistics[2] << "," << statistics[3];
 }
 
 int main() {
 
     std::uniform_int_distribution<int64_t> distribution(0, 1024);
 
+    for (int64_t vectorSize : SIZES) {
+        for (double density : DENSITIES) {
+
             stringstream ss;
-            int64_t vectorSize = 1;
-            double density = 0.05;
             ss << "bitvector_" << vectorSize << "MB_density" << (density * 100);
             string inFile = "data/" + ss.str() + ".txt";
-            string outFile = "results/" + ss.str() + ".csv";
+            string outFile = "results/sux/" + ss.str() + ".csv";
             // Bitvector size
-            int64_t size = vectorSize * MiB * 8; // size in bits
+            size_t sizeInBytes = vectorSize * MiB;
 
             std::cout << "\nStarting test with " << vectorSize << "MB and density " << density * 100 << "%\n";
             std::cout << "Input file is " << inFile << endl;
             std::cout << "Output file is " << outFile << endl;
     
-    // Load bitvector from test file
-    int64_t* b = loadBitVector(inFile, size);
+            outputFile.open(outFile);
 
-    size_t sizeInBytes = size >> 3;
+            outputFile << "Base structure,Operation,Support Structure,Size of base (bytes),Size of structure (bytes),Time to create (µs),";
+            outputFile << "média (ns),variância amostral,desvio padrão amostral, mediana (ns)\n";
+            // Load bitvector from test file
+            int64_t* b = loadBitVector(inFile, sizeInBytes);
 
-    testRank(b, sizeInBytes, distribution);
-    cout << "end of test\n";
-    testSelect(b, sizeInBytes, distribution);
-    // // Sleect is 0 based
-    // cout << "Select(1): " << newName.select(0) << endl;
-    // cout << "Select(2): " << newName.select(1) << endl;
 
-    free(b);
+            testRank(b, sizeInBytes, distribution);
+            outputFile << "\n";
+            testSelect(b, sizeInBytes, distribution);
+            outputFile << "\n";
+            
+            outputFile.close();
+            free(b);
+        }
+    }
+
 }
 
 
@@ -142,7 +148,7 @@ int64_t* loadBitVector(string fileName, int64_t size) {
         cout << "Não conseguiu abrir o arquivo\n";
         exit(1);
     }
-    int64_t* bitvector = (int64_t*) calloc(size >> 3, 8);  // Number of bytes
+    int64_t* bitvector = (int64_t*) calloc(size, 8);  // Number of bytes
     int64_t addr = 0, offset = 0;
     while(myfile) {
         char next = myfile.get();

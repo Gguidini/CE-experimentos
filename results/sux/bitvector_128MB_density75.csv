@@ -1,0 +1,3 @@
+Base structure,Operation,Support Structure,Size of base (bytes),Size of structure (bytes),Time to create (µs),média (ns),variância amostral,desvio padrão amostral, mediana (ns)
+int64_t*,rank,Rank9Sel,134217728,134217728,1631468,117,323812,569.045,100
+int64_t*,rank,Rank9Sel,134217728,134217728,1633346,183,422944,650.341,300
