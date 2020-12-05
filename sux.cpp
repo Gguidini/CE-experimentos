@@ -1,4 +1,4 @@
-// g++ -g -std=c++17 -Wall -Wextra -O0 -march=native -I ./ -I ~/include sux.cpp -fsanitize=address -fsanitize=undefined
+// g++ -std=c++17 -O0 -march=native -I ./ -I ~/include sux.cpp
 #include <sux/bits/Rank9Sel.hpp>
 
 #include <random>
@@ -47,8 +47,8 @@ void testRank(int64_t* b, int64_t sizeInBytes, std::uniform_int_distribution<int
     std::cout << "Statistics. Sample size: " << SAMPLE_SIZE << endl;
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
-        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         idx = (idx + distribution(generator)) % sizeInBytes;
+        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         ranker.rank(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
@@ -82,8 +82,8 @@ void testSelect(int64_t* b, int64_t sizeInBytes, std::uniform_int_distribution<i
     std::cout << "Statistics. Sample size: " << SAMPLE_SIZE << endl;
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
-        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         idx = (idx + distribution(generator)) % onesInBitVector;
+        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         ranker.select(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
