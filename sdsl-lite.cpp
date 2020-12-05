@@ -16,6 +16,8 @@ using namespace sdsl;
 #define SIZES {1, 16, 64, 128, 256, 512}
 #define DENSITIES {0.05, 0.1, 0.25, 0.5, 0.75, 0.9}
 
+bit_vector b;
+
 std::random_device rand_dev;
 std::mt19937 generator(rand_dev());
 
@@ -45,8 +47,8 @@ void testBitVector(bit_vector& b, int64_t size, std::uniform_int_distribution<in
     std::cout << "Statistics. Sample size: " << SAMPLE_SIZE << endl;
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
-        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         idx = (idx + distribution(generator)) % size;
+        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         rb.rank(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
@@ -81,8 +83,8 @@ void testBitVectorV5(bit_vector& b, int64_t size, std::uniform_int_distribution<
     std::cout << "Statistics. Sample size: " << SAMPLE_SIZE << endl;
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
-        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         idx = (idx + distribution(generator)) % size;
+        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         rb.rank(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
@@ -111,15 +113,15 @@ void testBitVectorSelect(bit_vector& b, int64_t size, std::uniform_int_distribut
 
     // Warm up structure with 1000 select operations
     // select(0) gives segfault.
-    for(int i = 0; i < 1000; i++) selectb.select((i % onesInBitVector) + 1);
-    std::cout << "Warm up complete\n";
+    for(int i = 0; i < 1000; i++) selectb.select((i+1) % onesInBitVector);
     int64_t idx = 0;
     vector<int64_t> observations(SAMPLE_SIZE);
     std::cout << "Statistics. Sample size: " << SAMPLE_SIZE << endl;
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
+        idx = ((idx + distribution(generator) + 1) % onesInBitVector);
+        if(idx == 0) idx++;
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-        idx = ((idx + distribution(generator)) % onesInBitVector) + 1;
         selectb.select(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
@@ -156,8 +158,8 @@ void testRRRVector(bit_vector& b, int64_t size, std::uniform_int_distribution<in
     vector<int64_t> observations(SAMPLE_SIZE);
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
-        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         idx = (idx + distribution(generator)) % size;
+        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         rank_rrrb.rank(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
@@ -186,14 +188,15 @@ void testRRRVectorSelect(bit_vector& b, int64_t size, std::uniform_int_distribut
     std::cout << "Size of the base structure in bytes (after support): " << size_in_bytes(rrrb) << endl;
     std::cout << "Size of select structure in bytes: " << size_in_bytes(select_rrrb) << endl;
 
-    for(int i = 0; i < 1000; i++) select_rrrb.select((i % onesInBitVector) + 1);
+    for(int i = 0; i < 1000; i++) select_rrrb.select((i + 1) % onesInBitVector);
 
     int64_t idx = 0;
     vector<int64_t> observations(SAMPLE_SIZE);
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
+        idx = ((idx + distribution(generator) + 1) % onesInBitVector);
+        if(idx == 0) idx++;
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-        idx = ((idx + distribution(generator)) % onesInBitVector) + 1;
         select_rrrb.select(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
@@ -228,8 +231,8 @@ void testSDVector(bit_vector& b, int64_t size, std::uniform_int_distribution<int
     vector<int64_t> observations(SAMPLE_SIZE);
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
-        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         idx = (idx + distribution(generator)) % size;
+        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         rank_sdb.rank(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
@@ -258,14 +261,15 @@ void testSDVectorSelect(bit_vector& b, int64_t size, std::uniform_int_distributi
     std::cout << "Size of the base structure in bytes: " << size_in_bytes(sdb) << endl;
     std::cout << "Size of select structure in bytes: " << size_in_bytes(select_sdb) << endl;
 
-    for(int i = 0; i < 1000; i++) select_sdb.select((i % onesInBitVector) + 1);
+    for(int i = 0; i < 1000; i++) select_sdb.select(((i+1) % onesInBitVector));
 
     int64_t idx = 0;
     vector<int64_t> observations(SAMPLE_SIZE);
     // Collect sample observations
     for(int i = 0; i < SAMPLE_SIZE; i++) {
+        idx = ((idx + distribution(generator) + 1) % onesInBitVector);
+        if(idx == 0) idx++;
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-        idx = ((idx + distribution(generator)) % onesInBitVector) + 1;
         select_sdb.select(idx);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         observations.push_back(chrono::duration_cast<chrono::nanoseconds>(end - begin).count());
@@ -292,7 +296,7 @@ int main() {
             stringstream ss;
             ss << "bitvector_" << vectorSize << "MB_density" << (density * 100);
             string inFile = "data/" + ss.str() + ".txt";
-            string outFile = "results/" + ss.str() + ".csv";
+            string outFile = "results/sdsl/" + ss.str() + ".csv";
             // Bitvector size
             int64_t size = vectorSize * MiB * 8; // size in bits
 
@@ -319,8 +323,10 @@ int main() {
             testSDVector(b, size, distribution);
             outputFile << "\n";
             testSDVectorSelect(b, size, distribution);
+            outputFile << "\n";
 
             outputFile.close();
+            
         }
     }
 }
@@ -335,7 +341,7 @@ bit_vector& loadBitVector(string fileName, int64_t size) {
         cout << "Não conseguiu abrir o arquivo\n";
         exit(1);
     }
-    static bit_vector b(size);            // bit_vector(size, prefil)
+    b.resize(size + 1);            // bit_vector(size, prefil)
     size_t i = 0;
     while(myfile) {
         char next = myfile.get();
@@ -347,6 +353,7 @@ bit_vector& loadBitVector(string fileName, int64_t size) {
         }
         i++;
     }
+    cout << "Loaded bit vector\n";
     return b;
 }
 

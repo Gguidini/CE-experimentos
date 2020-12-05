@@ -1,8 +1,8 @@
 Base structure,Operation,Support Structure,Size of base (bytes),Size of structure (bytes),Time to create (µs),média (ns),variância amostral,desvio padrão amostral, mediana (ns)
-bitvector,rank,rank_support_v,1048584,262168,344,16,15847.4,125.886,0
-bitvector,rank,rank_support_v5,1048584,65560,395,20,7777.32,88.1891,0
-bitvector,select,select_support_v,1048584,15070,64580,32,43424.7,208.386,0
-rrr_bitvector,rank,rrr_rank_support,124611,0,0,38,18724.4,136.837,0
-rrr_bitvector,select,rrr_select_support,124611,0,0,84,26237.6,161.98,100
-sd_bitvector,rank,sd_rank_support,159233,0,0,43,507233,712.203,0
-sd_bitvector,select,sd_select_support,159233,0,0,40,9960.4,99.8018,0
+bitvector,rank,rank_support_v,1048592,262168,1082,27,3327.67,57.686,0
+bitvector,rank,rank_support_v5,1048592,65560,1026,21,1703.97,41.2792,0
+bitvector,select,select_support_v,1048592,15582,85566,33,2480.89,49.8085,0
+rrr_bitvector,rank,rrr_rank_support,124611,0,0,50,1.37507e+06,1172.64,0
+rrr_bitvector,select,rrr_select_support,124611,0,0,92,13049.8,114.236,100
+sd_bitvector,rank,sd_rank_support,159233,0,0,23,2990.9,54.6891,0
+sd_bitvector,select,sd_select_support,159233,0,0,32,3696.49,60.7988,0
