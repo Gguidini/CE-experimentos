@@ -1,8 +1,8 @@
-Base structure,Operation,Support Structure,Size of base (bytes),Size of structure (bytes),Time to create (µs),média (ns),variância amostral,desvio padrão amostral, mediana (ns)
-bitvector,rank,rank_support_v,1048592,262168,773,22,2403.12,49.0216,0
-bitvector,rank,rank_support_v5,1048592,65560,722,14,1541.51,39.2621,0
-bitvector,select,select_support_v,1048592,12757,81437,46,4177.3,64.632,0
-rrr_bitvector,rank,rrr_rank_support,123099,0,0,30,4620.06,67.971,0
-rrr_bitvector,select,rrr_select_support,123099,0,0,169,34665.2,186.186,100
-sd_bitvector,rank,sd_rank_support,21172,0,0,27,3108.07,55.7501,0
-sd_bitvector,select,sd_select_support,21172,0,0,27,2976.16,54.5542,0
+Base structure,Operation,Support Structure,Size of base (bytes),Size of structure (bytes),Time to create base structure (µs),Time to create (µs),média (ns),variância amostral,desvio padrão amostral, mediana (ns)
+bitvector,rank,rank_support_v,1048592,262168,0,825,43,4.08953e+06,2022.26,0
+bitvector,rank,rank_support_v5,1048592,65560,0,1298,14,30810.4,175.529,0
+bitvector,select,select_support_v,1048592,12757,0,65151,44,55789.5,236.198,0
+rrr_bitvector,rank,rrr_rank_support,123099,0,3301,0,23,3571.06,59.7583,0
+rrr_bitvector,select,rrr_select_support,123099,0,2359,0,137,65320.3,255.578,100
+sd_bitvector,rank,sd_rank_support,21172,0,2314,0,22,38449.4,196.085,0
+sd_bitvector,select,sd_select_support,21172,0,2279,0,24,2500.73,50.0073,0

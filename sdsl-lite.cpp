@@ -62,7 +62,7 @@ void testBitVector(bit_vector& b, int64_t size, std::uniform_int_distribution<in
     std::cout << "========================================================\n";
 
     outputFile << "bitvector,rank,rank_support_v," << size_in_bytes(b) << "," << size_in_bytes(rb) << ",";
-    outputFile << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
+    outputFile << "0," << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ","; // First time is to create base structure, but bit_vector is already crated
     outputFile << statistics[0] << "," << statistics[1] << "," << statistics[2] << "," << statistics[3];
 }
 
@@ -98,7 +98,7 @@ void testBitVectorV5(bit_vector& b, int64_t size, std::uniform_int_distribution<
     std::cout << "========================================================\n";
 
     outputFile << "bitvector,rank,rank_support_v5," << size_in_bytes(b) << "," << size_in_bytes(rb) << ",";
-    outputFile << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
+    outputFile << "0," << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
     outputFile << statistics[0] << "," << statistics[1] << "," << statistics[2] << "," << statistics[3];
 }
 
@@ -136,19 +136,24 @@ void testBitVectorSelect(bit_vector& b, int64_t size, std::uniform_int_distribut
 
     
     outputFile << "bitvector,select,select_support_v," << size_in_bytes(b) << "," << size_in_bytes(selectb) << ",";
-    outputFile << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
+    outputFile << "0," << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
     outputFile << statistics[0] << "," << statistics[1] << "," << statistics[2] << "," << statistics[3];
 }
 
 void testRRRVector(bit_vector& b, int64_t size, std::uniform_int_distribution<int64_t>& distribution) {
     // Immutable, compressed structure
-    rrr_vector<> rrrb(b);
+    int64_t timeToCreateBase = 0, timeToCreateStructure = 0;
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-    rrr_vector<>::rank_1_type rank_rrrb(&rrrb);
+    rrr_vector<> rrrb(b);
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    timeToCreateBase = chrono::duration_cast<chrono::microseconds>(end - begin).count();
+    begin = chrono::steady_clock::now();
+    rrr_vector<>::rank_1_type rank_rrrb(&rrrb);
+    end = chrono::steady_clock::now();
+    timeToCreateStructure = chrono::duration_cast<chrono::microseconds>(end - begin).count();
 
     std::cout << "STRUCTURE - RRR_BITVECTOR (IMMUTABLE) | OPERATION - RANK\n";
-    std::cout << "Time to create rank struture: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << "µs" << endl;
+    std::cout << "Time to create rank struture: " << timeToCreateStructure << "µs" << endl;
     std::cout << "Size of the base structure in bytes (after support): " << size_in_bytes(rrrb) << endl;
     std::cout << "Size of rank structure in bytes: " << size_in_bytes(rank_rrrb) << endl;
 
@@ -172,19 +177,24 @@ void testRRRVector(bit_vector& b, int64_t size, std::uniform_int_distribution<in
     std::cout << "========================================================\n";
 
     outputFile << "rrr_bitvector,rank,rrr_rank_support," << size_in_bytes(rrrb) << "," << size_in_bytes(rank_rrrb) << ",";
-    outputFile << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
+    outputFile << timeToCreateBase << "," << timeToCreateStructure << ",";
     outputFile << statistics[0] << "," << statistics[1] << "," << statistics[2] << "," << statistics[3];
 }
 
 void testRRRVectorSelect(bit_vector& b, int64_t size, std::uniform_int_distribution<int64_t>& distribution) {
     // Immutable, compressed structure
-    rrr_vector<> rrrb(b);
+    int64_t timeToCreateBase = 0, timeToCreateStructure = 0;
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-    rrr_vector<>::select_1_type select_rrrb(&rrrb);
+    rrr_vector<> rrrb(b);
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    timeToCreateBase = chrono::duration_cast<chrono::microseconds>(end - begin).count();
+    begin = chrono::steady_clock::now();
+    rrr_vector<>::select_1_type select_rrrb(&rrrb);
+    end = chrono::steady_clock::now();
+    timeToCreateStructure = chrono::duration_cast<chrono::microseconds>(end - begin).count();
 
     std::cout << "STRUCTURE - RRR_BITVECTOR (IMMUTABLE) | OPERATION - SELECT\n";
-    std::cout << "Time to create select struture: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << "µs" << endl;
+    std::cout << "Time to create select struture: " <<  timeToCreateStructure << "µs" << endl;
     std::cout << "Size of the base structure in bytes (after support): " << size_in_bytes(rrrb) << endl;
     std::cout << "Size of select structure in bytes: " << size_in_bytes(select_rrrb) << endl;
 
@@ -209,19 +219,24 @@ void testRRRVectorSelect(bit_vector& b, int64_t size, std::uniform_int_distribut
     std::cout << "========================================================\n";
 
     outputFile << "rrr_bitvector,select,rrr_select_support," << size_in_bytes(rrrb) << "," << size_in_bytes(select_rrrb) << ",";
-    outputFile << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
+    outputFile << timeToCreateBase << "," << timeToCreateStructure << ",";
     outputFile << statistics[0] << "," << statistics[1] << "," << statistics[2] << "," << statistics[3];
 }
 
 void testSDVector(bit_vector& b, int64_t size, std::uniform_int_distribution<int64_t>& distribution) {
     // Immutable, compressed structure
-    sd_vector<> sdb(b);
+    int64_t timeToCreateBase = 0, timeToCreateStructure = 0;
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-    sd_vector<>::rank_1_type rank_sdb(&sdb);
+    sd_vector<> sdb(b);
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    timeToCreateBase = chrono::duration_cast<chrono::microseconds>(end - begin).count();
+    begin = chrono::steady_clock::now();
+    sd_vector<>::rank_1_type rank_sdb(&sdb);
+    end = chrono::steady_clock::now();
+    timeToCreateStructure = chrono::duration_cast<chrono::microseconds>(end - begin).count();
 
     std::cout << "STRUCTURE - RRR_BITVECTOR (IMMUTABLE) | OPERATION - RANK\n";
-    std::cout << "Time to create rank struture: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << "µs" << endl;
+    std::cout << "Time to create rank struture: " << timeToCreateStructure << "µs" << endl;
     std::cout << "Size of the base structure in bytes: " << size_in_bytes(sdb) << endl;
     std::cout << "Size of rank structure in bytes: " << size_in_bytes(rank_sdb) << endl;
 
@@ -245,19 +260,24 @@ void testSDVector(bit_vector& b, int64_t size, std::uniform_int_distribution<int
     std::cout << "========================================================\n";
 
     outputFile << "sd_bitvector,rank,sd_rank_support," << size_in_bytes(sdb) << "," << size_in_bytes(rank_sdb) << ",";
-    outputFile << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
+    outputFile << timeToCreateBase << "," << timeToCreateStructure << ",";
     outputFile << statistics[0] << "," << statistics[1] << "," << statistics[2] << "," << statistics[3];
 }
 
 void testSDVectorSelect(bit_vector& b, int64_t size, std::uniform_int_distribution<int64_t>& distribution) {
     // Immutable, compressed structure
-    sd_vector<> sdb(b);
+    int64_t timeToCreateBase = 0, timeToCreateStructure = 0;
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-    sd_vector<>::select_1_type select_sdb(&sdb);
+    sd_vector<> sdb(b);
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    timeToCreateBase = chrono::duration_cast<chrono::microseconds>(end - begin).count();
+    begin = chrono::steady_clock::now();
+    sd_vector<>::select_1_type select_sdb(&sdb);
+    end = chrono::steady_clock::now();
+    timeToCreateStructure = chrono::duration_cast<chrono::microseconds>(end - begin).count();
 
     std::cout << "STRUCTURE - RRR_BITVECTOR (IMMUTABLE) | OPERATION - SELECT\n";
-    std::cout << "Time to create select struture: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << "µs" << endl;
+    std::cout << "Time to create select struture: " << timeToCreateStructure << "µs" << endl;
     std::cout << "Size of the base structure in bytes: " << size_in_bytes(sdb) << endl;
     std::cout << "Size of select structure in bytes: " << size_in_bytes(select_sdb) << endl;
 
@@ -282,7 +302,7 @@ void testSDVectorSelect(bit_vector& b, int64_t size, std::uniform_int_distributi
     std::cout << "========================================================\n";
 
     outputFile << "sd_bitvector,select,sd_select_support," << size_in_bytes(sdb) << "," << size_in_bytes(select_sdb) << ",";
-    outputFile << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
+    outputFile << timeToCreateBase << "," << timeToCreateStructure << ",";
     outputFile << statistics[0] << "," << statistics[1] << "," << statistics[2] << "," << statistics[3];
 }
 
@@ -307,7 +327,7 @@ int main() {
             bit_vector b = loadBitVector(inFile, size);
             outputFile.open(outFile);
 
-            outputFile << "Base structure,Operation,Support Structure,Size of base (bytes),Size of structure (bytes),Time to create (µs),";
+            outputFile << "Base structure,Operation,Support Structure,Size of base (bytes),Size of structure (bytes),Time to create base structure (µs),Time to create (µs),";
             outputFile << "média (ns),variância amostral,desvio padrão amostral, mediana (ns)\n";
             
             testBitVector(b, size, distribution);
