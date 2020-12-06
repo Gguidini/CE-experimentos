@@ -96,7 +96,7 @@ void testSelect(int64_t* b, int64_t sizeInBytes, std::uniform_int_distribution<i
     std::cout << "Mediana: " << statistics[3] << endl;
     std::cout << "========================================================\n";
 
-    outputFile << "int64_t*,rank,Rank9Sel," << sizeInBytes << "," << ranker.size() << ",";
+    outputFile << "int64_t*,select,Rank9Sel," << sizeInBytes << "," << ranker.size() << ",";
     outputFile << chrono::duration_cast<chrono::microseconds>(end - begin).count() << ",";
     outputFile << statistics[0] << "," << statistics[1] << "," << statistics[2] << "," << statistics[3];
 }

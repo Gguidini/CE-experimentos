@@ -1,5 +1,7 @@
-// COMPILE WITH g++ -std=c++11 -O3 -DNDEBUG -I ~/include -L ~/lib sdsl-lite.cpp -lsdsl -ldivsufsort -ldivsufsort64
+// COMPILE WITH g++ -std=c++17 -O3 -DNDEBUG -I ./ -I ~/include -L ~/lib distributionTest.cpp -lsdsl -ldivsufsort -ldivsufsort64 -march=native
 #include <sdsl/bit_vectors.hpp>
+#include <sux/bits/Rank9Sel.hpp>
+
 #include <iostream>
 #include <fstream>
 #include <chrono>
@@ -8,6 +10,7 @@
 
 using namespace std;
 using namespace sdsl;
+using namespace sux::bits;
 
 #define MiB 1048576
 #define SAMPLE_SIZE 500
@@ -18,13 +21,14 @@ using namespace sdsl;
 
 bit_vector b;
 
-// int64_t onesInBitVector;
+int64_t onesInBitVector;
 // CSV FIle with following headers:
 // Base tructure | Operation | Support Structure | Size of base | Size of structure | Time to create | ...statistics
 ofstream outputFile;
 
 // AUX functions, declared at the end of the file
 bit_vector& loadBitVector(string fileName, int64_t size);
+int64_t* loadBitVectorSux(string fileName, int64_t size);
 vector<pair<string,double>> calculateStatistics(vector<double>& observations);
 void saveInfoToFile(string baseStructure, string testStructure, bool isRankOp, vector<pair<string,double>>& statistics, vector<double>& sample);
 
@@ -97,6 +101,7 @@ void testBitVectorSelect(bit_vector& b, vector<int64_t>& indexes) {
     vector<double> sample(SAMPLE_SIZE);
     for (int test = 0; test < 500; test++) {
         std::cout << test+1 << "/500\r";
+        
         // Result = (time to create structure + time of SAMPLE_SIZE operations)
         // Create structure
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
@@ -106,10 +111,12 @@ void testBitVectorSelect(bit_vector& b, vector<int64_t>& indexes) {
 
         if(test == 0) {
             // First run gets warm up round, untimed
-            for(int i = 0; i < 1000; i++) selectb.select(i);
+            for(int i = 1; i < 1000; i++) selectb.select(i);
         }
 
-        for(int64_t idx: indexes) {
+        for(size_t i = 0; i < RUN_SIZE; i++) {
+            int64_t idx = indexes[i];
+            if (idx > onesInBitVector) idx = onesInBitVector;
             chrono::steady_clock::time_point begin = chrono::steady_clock::now();
             selectb.select(idx);
             chrono::steady_clock::time_point end = chrono::steady_clock::now();
@@ -177,10 +184,12 @@ void testRRRVectorSelect(bit_vector& b, vector<int64_t>& indexes) {
 
         if(test == 0) {
             // First run gets warm up round, untimed
-            for(int i = 0; i < 1000; i++) select_rrrb.select(i);
+            for(int i = 1; i < 1000; i++) select_rrrb.select(i);
         }
 
-        for(int64_t idx: indexes) {
+        for(size_t i = 0; i < RUN_SIZE; i++) {
+            int64_t idx = indexes[i];
+            if (idx > onesInBitVector) idx = onesInBitVector;
             chrono::steady_clock::time_point begin = chrono::steady_clock::now();
             select_rrrb.select(idx);
             chrono::steady_clock::time_point end = chrono::steady_clock::now();
@@ -249,10 +258,12 @@ void testSDVectorSelect(bit_vector& b, vector<int64_t>& indexes) {
 
         if(test == 0) {
             // First run gets warm up round, untimed
-            for(int i = 0; i < 1000; i++) select_sdb.select(i);
+            for(int i = 1; i < 1000; i++) select_sdb.select(i);
         }
 
-        for(int64_t idx: indexes) {
+        for(size_t i = 0; i < RUN_SIZE; i++) {
+            int64_t idx = indexes[i];
+            if (idx > onesInBitVector) idx = onesInBitVector;
             chrono::steady_clock::time_point begin = chrono::steady_clock::now();
             select_sdb.select(idx);
             chrono::steady_clock::time_point end = chrono::steady_clock::now();
@@ -266,6 +277,101 @@ void testSDVectorSelect(bit_vector& b, vector<int64_t>& indexes) {
     saveInfoToFile("sd_bit_vector", "select_support_sd", false, stats, sample);
 }
 
+void testRank9(int64_t* b, int64_t sizeInBytes, vector<int64_t>& indexes) {
+    std::cout << "int64_t* - Rank9Sel - rank\n";
+    // Run 500 tests, save results.
+    vector<double> sample(SAMPLE_SIZE);
+    for (int test = 0; test < SAMPLE_SIZE; test++) {
+        std::cout << test+1 << "/500\r";
+        // Result = (time to create structure + time of SAMPLE_SIZE operations)
+        // Create structure
+        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+        sux::bits::Rank9Sel<> ranker((const uint64_t*) b, sizeInBytes);
+        chrono::steady_clock::time_point end = chrono::steady_clock::now();
+        double totalTime = chrono::duration_cast<chrono::microseconds>(end - begin).count();
+
+        if(test == 0) {
+            // First run gets warm up round, untimed
+            for(int i = 0; i < 1000; i++) ranker.rank(i);
+        }
+
+        for(int64_t idx: indexes) {
+            chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+            ranker.rank(idx);
+            chrono::steady_clock::time_point end = chrono::steady_clock::now();
+            totalTime = totalTime + (chrono::duration_cast<chrono::nanoseconds>(end - begin).count() / 1000.0);
+        }
+        sample[test] = totalTime;
+    }
+    std::cout << "test ended ✔\n";
+    vector<pair<string,double>> stats = calculateStatistics(sample);
+    saveInfoToFile("int64_t*", "Rank9Sel", true, stats, sample);
+}
+
+void testSelect9(int64_t* b, int64_t sizeInBytes, vector<int64_t>& indexes) {
+    std::cout << "int64_t* - Rank9Sel - select\n";
+    // Run 500 tests, save results.
+    vector<double> sample(SAMPLE_SIZE);
+    for (int test = 0; test < SAMPLE_SIZE; test++) {
+        std::cout << test+1 << "/500\r";
+        // Result = (time to create structure + time of SAMPLE_SIZE operations)
+        // Create structure
+        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+        sux::bits::Rank9Sel<> selector((const uint64_t*) b, sizeInBytes);
+        chrono::steady_clock::time_point end = chrono::steady_clock::now();
+        double totalTime = chrono::duration_cast<chrono::microseconds>(end - begin).count();
+
+        if(test == 0) {
+            // First run gets warm up round, untimed
+            for(int i = 0; i < 1000; i++) selector.select(i);
+        }
+
+        for(size_t i = 0; i < RUN_SIZE; i++) {
+            int64_t idx = indexes[i];
+            if (idx > onesInBitVector) idx = onesInBitVector;
+            chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+            selector.select(idx);
+            chrono::steady_clock::time_point end = chrono::steady_clock::now();
+            totalTime = totalTime + (chrono::duration_cast<chrono::nanoseconds>(end - begin).count() / 1000.0);
+        }
+        sample[test] = totalTime;
+    }
+    std::cout << "test ended ✔\n";
+    vector<pair<string,double>> stats = calculateStatistics(sample);
+    saveInfoToFile("int64_t*", "Rank9Sel", false, stats, sample);
+}
+
+void runSdslTests(string inFile, int64_t sizeInBits, vector<int64_t>& index) {
+    // Load bitvector from test file
+    std::cout << "==> SDSL Structures ▶\n";
+    bit_vector b = loadBitVector(inFile, sizeInBits);
+    // Run tests per structure
+    testBitVector(b, index);
+    outputFile << ",\n";
+    testBitVectorV5(b, index);
+    outputFile << ",\n";
+    // testBitVectorSelect(b, index);
+    // outputFile << ",\n";
+    testRRRVector(b, index);
+    outputFile << ",\n";
+    testRRRVectorSelect(b, index);
+    outputFile << ",\n";
+    testSDVector(b, index);
+    outputFile << ",\n";
+    testSDVectorSelect(b, index);
+    std::cout << "==> All SDSL Structures tested ✔\n";
+}
+
+void runSuxTests(string inFile, int64_t sizeInBytes, vector<int64_t>& index) {
+    // Load bit vector
+    std::cout << "==> Sux Structures ▶\n";
+    int64_t* b = loadBitVectorSux(inFile, sizeInBytes);
+    // Run tests per structure
+    testRank9(b, sizeInBytes, index);
+    outputFile << ",\n";
+    testSelect9(b, sizeInBytes, index);
+    std::cout << "==> All Sux Structures tested ✔\n";
+}
 
 int main() {
 
@@ -288,8 +394,9 @@ int main() {
         isIndex >> index[i];
     }
     std::cout << "Index carregado ✔\n";
+
     stringstream outName;
-    outName << "statistics/sdsl/" << SIZE << "MB.json";
+    outName << "statistics/" << SIZE << "MB.json";
     outputFile.open(outName.str());
     outputFile << "{\n";
 
@@ -301,22 +408,12 @@ int main() {
         
         std::cout << "\nStarting test with " << SIZE << "MB and density " << density * 100 << "%\n";
         outputFile << "\t\"density_" << (density * 100) << "\": [\n";
-        // Load bitvector from test file
-        bit_vector b = loadBitVector(inFile, sizeInBits);
-        // Run tests per structure
-        testBitVector(b, index);
+        // Run sdsl tests
+        runSdslTests(inFile, sizeInBits, index);
         outputFile << ",\n";
-        testBitVectorV5(b, index);
-        outputFile << ",\n";
-        testBitVectorSelect(b, index);
-        outputFile << ",\n";
-        testRRRVector(b, index);
-        outputFile << ",\n";
-        testRRRVectorSelect(b, index);
-        outputFile << ",\n";
-        testSDVector(b, index);
-        outputFile << ",\n";
-        testSDVectorSelect(b, index);
+        runSuxTests(inFile, sizeInBits >> 3, index);
+        outputFile << "\n";
+
         outputFile << "\t],\n";
     }
     outputFile << "}\n";
@@ -327,7 +424,7 @@ int main() {
 
 // AUX Functions
 bit_vector& loadBitVector(string fileName, int64_t size) {
-    // onesInBitVector = 0;
+    onesInBitVector = 0;
     ifstream myfile (fileName);
     if(!myfile.is_open()) {
         cout << "Não conseguiu abrir o arquivo\n";
@@ -339,14 +436,34 @@ bit_vector& loadBitVector(string fileName, int64_t size) {
         char next = myfile.get();
         if (next == '1') {
             b[i] = 1;
-            // onesInBitVector++;
+            onesInBitVector++;
         } else {
             b[i] = 0;
         }
         i++;
     }
-    cout << "Loaded bit vector\n";
+    cout << "Loaded bit vector ✔\n";
     return b;
+}
+
+int64_t* loadBitVectorSux(string fileName, int64_t size) {
+    ifstream myfile (fileName);
+    if(!myfile.is_open()) {
+        cout << "Não conseguiu abrir o arquivo\n";
+        exit(1);
+    }
+    int64_t* bitvector = (int64_t*) calloc(size, 8);  // Number of bytes
+    int64_t addr = 0, offset = 0;
+    while(myfile) {
+        char next = myfile.get();
+        if (next == '1') {
+            bitvector[addr / 64] |= (1LL << offset);
+        } 
+        addr++;
+        offset = (offset + 1)%64;
+    }
+    cout << "Loaded bit vector ✔\n";
+    return bitvector;
 }
 
 vector<pair<string,double>> calculateStatistics(vector<double>& observations) {
@@ -401,7 +518,7 @@ void saveInfoToFile(string baseStructure, string testStructure, bool isRankOp, v
     outputFile << "\t\t{\n";
     outputFile << "\t\t\t" << "\"base_structure\": \"" << baseStructure << "\",\n"; 
     outputFile << "\t\t\t" << "\"test_structure\": \"" << testStructure << "\",\n"; 
-    outputFile << "\t\t\t" << "\"run_size\": " << RUN_SIZE << "\n"; 
+    outputFile << "\t\t\t" << "\"run_size\": " << RUN_SIZE << ",\n"; 
     outputFile << "\t\t\t" << "\"operation\": " << (isRankOp ? "\"rank\"" : "\"select\"") << ",\n"; 
     outputFile << "\t\t\t" << "\"statistics\": " << vectorToString(statistics) << ",\n";
     outputFile << "\t\t\t" << "\"sample\": " << vectorToString(sample) << "\n";
