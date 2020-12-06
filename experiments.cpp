@@ -38,7 +38,7 @@ void testBitVector(bit_vector& b, vector<int64_t>& indexes) {
     vector<double> sample(SAMPLE_SIZE);
     int64_t sizeOfStructure = 0;
     for (int test = 0; test < SAMPLE_SIZE; test++) {
-        std::cout << test+1 << "/500\r";
+        std::cout << test+1 << "/" << SAMPLE_SIZE << "\r";
         // Result = (time to create structure + time of SAMPLE_SIZE operations)
         // Create structure
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
@@ -70,8 +70,8 @@ void testBitVectorV5(bit_vector& b, vector<int64_t>& indexes) {
     // Run 500 tests, save results.
     vector<double> sample(SAMPLE_SIZE);
     int64_t sizeOfStructure = 0;
-    for (int test = 0; test < 500; test++) {
-        std::cout << test+1 << "/500\r";
+    for (int test = 0; test < SAMPLE_SIZE; test++) {
+        std::cout << test+1 << "/" << SAMPLE_SIZE << "\r";
         // Result = (time to create structure + time of SAMPLE_SIZE operations)
         // Create structure
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
@@ -104,8 +104,8 @@ void testBitVectorSelect(bit_vector& b, vector<int64_t>& indexes) {
     // Run 500 tests, save results.
     vector<double> sample(SAMPLE_SIZE);
     int64_t sizeOfStructure = 0;
-    for (int test = 0; test < 500; test++) {
-        std::cout << test+1 << "/500\r";
+    for (int test = 0; test < SAMPLE_SIZE; test++) {
+        std::cout << test+1 << "/" << SAMPLE_SIZE << "\r";
         
         // Result = (time to create structure + time of SAMPLE_SIZE operations)
         // Create structure
@@ -141,8 +141,8 @@ void testRRRVector(bit_vector& b, vector<int64_t>& indexes) {
     // Run 500 tests, save results.
     vector<double> sample(SAMPLE_SIZE);
     int64_t sizeOfStructure = 0;
-    for (int test = 0; test < 500; test++) {
-        std::cout << test+1 << "/500\r";
+    for (int test = 0; test < SAMPLE_SIZE; test++) {
+        std::cout << test+1 << "/" << SAMPLE_SIZE << "\r";
         // Result = (time to create structure + time of SAMPLE_SIZE operations)
         // Create base structure and rank structure
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
@@ -179,8 +179,8 @@ void testRRRVectorSelect(bit_vector& b, vector<int64_t>& indexes) {
     // Run 500 tests, save results.
     vector<double> sample(SAMPLE_SIZE);
     int64_t sizeOfStructure = 0;
-    for (int test = 0; test < 500; test++) {
-        std::cout << test+1 << "/500\r";
+    for (int test = 0; test < SAMPLE_SIZE; test++) {
+        std::cout << test+1 << "/" << SAMPLE_SIZE << "\r";
         // Create base structure and select structure
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
         rrr_vector<> rrrb(b);
@@ -218,8 +218,8 @@ void testSDVector(bit_vector& b, vector<int64_t>& indexes) {
     // Run 500 tests, save results.
     vector<double> sample(SAMPLE_SIZE);
     int64_t sizeOfStructure = 0;
-    for (int test = 0; test < 500; test++) {
-        std::cout << test+1 << "/500\r";
+    for (int test = 0; test < SAMPLE_SIZE; test++) {
+        std::cout << test+1 << "/" << SAMPLE_SIZE << "\r";
         // Result = (time to create structure + time of SAMPLE_SIZE operations)
         // Create base structure and rank structure
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
@@ -257,8 +257,8 @@ void testSDVectorSelect(bit_vector& b, vector<int64_t>& indexes) {
     // Run 500 tests, save results.
     vector<double> sample(SAMPLE_SIZE);
     int64_t sizeOfStructure = 0;
-    for (int test = 0; test < 500; test++) {
-        std::cout << test+1 << "/500\r";
+    for (int test = 0; test < SAMPLE_SIZE; test++) {
+        std::cout << test+1 << "/" << SAMPLE_SIZE << "\r";
         // Result = (time to create structure + time of SAMPLE_SIZE operations)
         // Create base structure and rank structure
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
@@ -298,7 +298,7 @@ void testRank9(int64_t* b, int64_t sizeInBytes, vector<int64_t>& indexes) {
     vector<double> sample(SAMPLE_SIZE);
     int64_t sizeOfStructure = 0;
     for (int test = 0; test < SAMPLE_SIZE; test++) {
-        std::cout << test+1 << "/500\r";
+        std::cout << test+1 << "/" << SAMPLE_SIZE << "\r";
         // Result = (time to create structure + time of SAMPLE_SIZE operations)
         // Create structure
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
@@ -332,7 +332,7 @@ void testSelect9(int64_t* b, int64_t sizeInBytes, vector<int64_t>& indexes) {
     vector<double> sample(SAMPLE_SIZE);
     int64_t sizeOfStructure = 0;
     for (int test = 0; test < SAMPLE_SIZE; test++) {
-        std::cout << test+1 << "/500\r";
+        std::cout << test+1 << "/" << SAMPLE_SIZE << "\r";
         // Result = (time to create structure + time of SAMPLE_SIZE operations)
         // Create structure
         chrono::steady_clock::time_point begin = chrono::steady_clock::now();
